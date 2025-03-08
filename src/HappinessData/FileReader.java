@@ -5,56 +5,55 @@ import java.nio.file.Path;
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
+import static HappinessData.CountryHappiness.*;
 
 public class FileReader {
-    public static Object[][] read(String path) throws IOException {
+
+    public static ArrayList<CountryHappiness> read(String path) throws IOException {
         String content = Files.readString(Path.of(path), StandardCharsets.UTF_8);
-        BufferedReader reader = new BufferedReader(new StringReader(content));
-        final int ROW_AMOUNT = 6;
+        try (BufferedReader reader = new BufferedReader(new StringReader(content))) {
+            final int ROW_AMOUNT = 6;
+            final int DEFAULT_AMOUNT = 0;
 
-       List<Object[]> countryHappinessDataStr =
-               reader.lines()
-                       .skip(1) // skips the header row
-                       .map(line -> {
-                           String[] row = line.split(",");
+            // for each line in the data place a new CountryHappiness object inside the ArrayList
+            // filter out the null values within rows
+            return reader.lines()
+                    .skip(1) // skips the header row
+                    .map(line -> {
+                        String[] row = line.split(",");
 
-                           if (row.length != ROW_AMOUNT) {
-                               return null; // skip the rows with no values
-                           }
+                        if (row.length != ROW_AMOUNT) {
+                            return null; // skip the rows with no values
+                        }
 
-                           return new CountryHappiness(
-                                   row[0],
-                                   Integer.parseInt(row[1]),
-                                   parseWithDefaultIfNull(row[2], 0.0),
-                                   parseWithDefaultIfNull(row[3], 0.0),
-                                   parseWithDefaultIfNull(row[4], 0.0),
-                                   parseWithDefaultIfNull(row[5], 0.0)
-                           );
-                       }).filter(Objects::nonNull) // filter out the rows that returned null
-                       .map(CountryHappiness::toObjectArray).toList();
-
-
-       return countryHappinessDataStr.toArray(new Object[0][]);
-
-
+                        return new CountryHappiness(
+                                row[COUNTRY],
+                                parseIntWithDefaultIfNull(row[HAPPINESS_RANK], DEFAULT_AMOUNT),
+                                parseDoubleWithDefaultIfNull(row[HAPPINESS_SCORE], DEFAULT_AMOUNT),
+                                parseDoubleWithDefaultIfNull(row[ECONOMY], DEFAULT_AMOUNT),
+                                parseDoubleWithDefaultIfNull(row[SOCIAL_SCORE], DEFAULT_AMOUNT),
+                                parseDoubleWithDefaultIfNull(row[HEALTH_SCORE], DEFAULT_AMOUNT)
+                        );
+                    }).filter(Objects::nonNull) // filter out the rows that returned null
+                    .collect(Collectors.toCollection(ArrayList::new));
+        }
     }
 
-    // TODO: MOVE THIS TO ITS OWN SEPARATE FILE
-    // TODO: THIS IS JUST FOR TESTING PURPOSES
-    public static void main(String[] args) throws IOException {
-        Object[][] objects = read("data/2024.csv");
-        // Print Out the Items in the first row
-        System.out.println(Arrays.toString(new Object[]{objects[0]}));
-        // Print Out the Items in the 10th row
-        System.out.println(Arrays.toString(objects[9]));
-        }
 
-        // if rows contain empty values just default to 0.0
-        public static double parseWithDefaultIfNull(String s, double defaultValue){
+    // if rows contain empty values just default to 0
+    public static double parseDoubleWithDefaultIfNull(String s, double defaultValue){
+    if(s == null || s.trim().isEmpty()){
+            return defaultValue;
+        }
+        return Double.parseDouble(s);
+    }
+
+    // if rows contain empty values just default to 0
+    public static int parseIntWithDefaultIfNull(String s, int defaultValue){
         if(s == null || s.trim().isEmpty()){
-                return defaultValue;
-            }
-            return Double.parseDouble(s);
+            return defaultValue;
         }
+        return Integer.parseInt(s);
     }
+}
 

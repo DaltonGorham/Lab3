@@ -8,17 +8,10 @@ public record CountryHappiness(
         double socialScore,
         double healthScore ) {
 
-
-    public Object[] toObjectArray() {
-        Object[] objects = new Object[6];
-        objects[0] = country;
-        objects[1] = happinessRank;
-        objects[2] = happinessScore;
-        objects[3] = economy;
-        objects[4] = socialScore;
-        objects[5] = healthScore;
-        return objects;
-    }
-
-    //TODO: MAKE ENUMS FOR EACH ROW HEADER INSTEAD OF USING ROW[0]
+    public static final int COUNTRY = 0;
+    public static final int HAPPINESS_RANK = 1;
+    public static final int HAPPINESS_SCORE = 2;
+    public static final int ECONOMY = 3;
+    public static final int SOCIAL_SCORE = 4;
+    public static final int HEALTH_SCORE = 5;
 }
