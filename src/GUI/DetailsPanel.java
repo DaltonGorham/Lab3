@@ -8,7 +8,6 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
 public class DetailsPanel extends JPanel implements RowListener {
-    private JLabel[] labels;
     private JLabel[] textLabels;
     private JLabel titleLabel;
     private final int PANEL_WIDTH = 300;
@@ -18,6 +17,7 @@ public class DetailsPanel extends JPanel implements RowListener {
     private final int HORIZONTAL_GAP = 30;
     private final int VERTICAL_GAP = 10;
     private final int PADDING_SIZE = 10;
+    private final int NUM_LABELS = 6;
 
     /**
      * Constructs a new DetailsPanel object.
@@ -45,16 +45,6 @@ public class DetailsPanel extends JPanel implements RowListener {
        // set border for looks
        infoPanel.setBorder(new MatteBorder(0, 0, 2, 2, Color.BLACK));
 
-       // initialize labels with column names
-        labels = new JLabel[]{
-                new JLabel("Country"),
-                new JLabel("Happiness Rank"),
-                new JLabel("Happiness Score"),
-                new JLabel("Economy Score"),
-                new JLabel("Social Score"),
-                new JLabel("Health Score")
-        };
-
         textLabels = new JLabel[]{
                 new JLabel(),
                 new JLabel(),
@@ -65,12 +55,10 @@ public class DetailsPanel extends JPanel implements RowListener {
         };
 
         // add the labels to the panel with formatting
-        for (int i = 0; i < labels.length; i++) {
-            labels[i].setFont(new Font("Arial", Font.PLAIN, 14));
+        for (int i = 0; i < NUM_LABELS; i++) {
             textLabels[i].setFont(new Font("Arial", Font.PLAIN, 14));
             textLabels[i].setBackground(Color.LIGHT_GRAY);
 
-            infoPanel.add(labels[i]);
             infoPanel.add(textLabels[i]);
         }
         add(infoPanel, BorderLayout.WEST); // after all labels have been added to info panel, and the info panel to details panel
@@ -81,10 +69,10 @@ public class DetailsPanel extends JPanel implements RowListener {
      * @param details An array of strings containing new text values to update the labels.
      */
     public void updateDetails(String[] details) {
+        clearDetails();
         for (int i = 0; i < details.length; i++) {
             textLabels[i].setText(details[i]);
         }
-
     }
 
     /**
@@ -97,5 +85,16 @@ public class DetailsPanel extends JPanel implements RowListener {
     public void onRowClicked(String[] details) {
         updateDetails(details);
         setVisible(true);
+        repaint();
+        revalidate();
+    }
+
+    void clearDetails(){
+        for (JLabel label : textLabels) {
+            label.setText("");
+        }
+
+        revalidate();
+        repaint();
     }
 }

@@ -9,6 +9,8 @@ import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import static HappinessData.FileReader.read;
+
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -155,10 +157,13 @@ public class TablePanel extends JPanel implements FilterListener{
      */
 
     public void updateDetailsPanel(int row) {
-        String[] details = new String[columnNames.length];
-            for (int i = 0; i < columnNames.length; i++) {
-                details[i] = model.getValueAt(row, i).toString();
-        }
+        int numColumns = model.getColumnCount();
+        String[] details = new String[numColumns];
+            for (int i = 0; i < numColumns; i++) {
+                details[i] = model.getColumnName(i) + "  ->  " + model.getValueAt(row, i).toString() + "    ";
+
+            }
+
             detailsPanel.onRowClicked(details);
     }
 }

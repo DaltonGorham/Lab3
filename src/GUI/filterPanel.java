@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 public class filterPanel extends JPanel {
     private List<JCheckBox> filterCheckboxes;
     private FilterListener listener;
+    private JLabel titleLabel;
 
     /**
      * Constructor that creates the filter panel with checkboxes for each column.
@@ -16,6 +17,10 @@ public class filterPanel extends JPanel {
         filterCheckboxes = new ArrayList<>();
         // Define all columns that can be filtered (Country is always shown so it's not included)
         String[] filterOptions = {"Happiness Rank", "Happiness Score", "Economy Score", "Social Score", "Health Score"};
+
+        titleLabel = new JLabel("Filter By: ");
+        add(titleLabel);
+
 
         // Create a checkbox for each filter option
         for (String filterOption : filterOptions) {
