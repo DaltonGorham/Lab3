@@ -5,12 +5,9 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import static HappinessData.FileReader.read;
-
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -22,6 +19,7 @@ public class TablePanel extends JPanel implements FilterListener{
     private String[] columnNames;
     private filterPanel filterPanel;
     private DetailsPanel detailsPanel;
+    private DataUpdateListener dataChangeListener; // listener for the stats panel
 
     /**
      * Constructor that initializes the table panel with data from CSV file.
@@ -105,6 +103,7 @@ public class TablePanel extends JPanel implements FilterListener{
     @Override
     public void onRangeFilterApplied(String metric, double min, double max) {
         model.setRowCount(0);
+        List<CountryHappiness> filteredData = new ArrayList<>();
         for (CountryHappiness country : data) {
             if (meetsRangeFilter(country, metric, min, max)) {
                 Object[] row = {
@@ -115,14 +114,18 @@ public class TablePanel extends JPanel implements FilterListener{
                         country.socialScore(),
                         country.healthScore()
                 };
+                filteredData.add(country);
                 model.addRow(row);
             }
         }
+        dataChangeListener.onDataUpdated(filteredData);
     }
+
 
     // resets back to original table without filters
     @Override
     public void onResetFilters() {
+        dataChangeListener.onDataUpdated(data); // if reset change stats back to original table
         model.setRowCount(0);
         addDataToModel(model);
     }
@@ -170,9 +173,14 @@ public class TablePanel extends JPanel implements FilterListener{
         String[] details = new String[numColumns];
             for (int i = 0; i < numColumns; i++) {
                 // set the details array here to prevent problems in details panel
-                details[i] = model.getColumnName(i) + "  ->  " + model.getValueAt(row, i).toString() + "    ";
+                details[i] = model.getColumnName(i) + "  =====>  " + model.getValueAt(row, i).toString() + "    ";
 
             }
             detailsPanel.onRowClicked(details);
     }
+
+    public void setDataChangeListener(DataUpdateListener listener) {
+        this.dataChangeListener = listener;
+    }
+
 }

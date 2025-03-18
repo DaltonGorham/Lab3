@@ -1,29 +1,29 @@
 package GUI;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.border.MatteBorder;
 import java.awt.*;
-import java.awt.event.MouseListener;
-import java.util.ArrayList;
 
 public class DetailsPanel extends JPanel implements RowListener {
     private JTextArea detailsArea;
     private RowListener listener;
     public DetailsPanel() {
 
-        setLayout(new BorderLayout(10, 10));
-        setPreferredSize(new Dimension(500, 300));
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setPreferredSize(new Dimension(600, 300));
+        setMaximumSize(new Dimension(600, 300));
 
         JLabel title = new JLabel("Country Details");
         title.setFont(new Font("Arial", Font.BOLD, 20));
-        add(title, BorderLayout.NORTH);
+        title.setAlignmentX(Component.LEFT_ALIGNMENT);
+        add(title);
 
         detailsArea = new JTextArea();
         detailsArea.setEditable(false);
-        detailsArea.setPreferredSize(new Dimension(400, 200));
+        detailsArea.setPreferredSize(new Dimension(280, 250));
         detailsArea.setBorder(new MatteBorder(0, 0, 3, 3, Color.BLACK));
-        add(detailsArea, BorderLayout.WEST);
+        detailsArea.setAlignmentX(Component.LEFT_ALIGNMENT);
+        add(detailsArea);
         setVisible(false);
 
     }
@@ -41,7 +41,7 @@ public class DetailsPanel extends JPanel implements RowListener {
         detailsArea.setText("");
         for (String detail : details) {
             detailsArea.append(detail + "\n\n");
-            detailsArea.setFont(new Font("Arial", Font.BOLD, 20));
+            detailsArea.setFont(new Font("Arial", Font.BOLD, 16));
         }
         setVisible(true);
         repaint();
