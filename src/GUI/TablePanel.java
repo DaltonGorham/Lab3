@@ -72,8 +72,8 @@ public class TablePanel extends JPanel implements FilterListener{
         this.setLayout(new BorderLayout());
 
         // Create filter panel and register this class as the listener
-        filterPanel = new filterPanel();
-        filterPanel.setFilterListener(this);
+
+        filterPanel = new filterPanel(this);
         add(filterPanel, BorderLayout.NORTH);
 
         // Create the table with model and add it to a scroll pane
@@ -94,47 +94,58 @@ public class TablePanel extends JPanel implements FilterListener{
         });
     }
 
-
     /**
-     * Implementation of FilterListener interface.
-     * Called when checkbox selection changes in the filter panel.
-     * Updates the table to show only selected columns.
-     * @param filters List of column names that should be displayed
+     * Filters the data based on the specified metric and range values (minimum and maximum),
+     * and updates the table model to display only the rows that meet the filter condition.
+     *
+     * @param metric the metric to filter by (e.g., "Happiness Score", "Economy Score", etc.)
+     * @param min the minimum value of the range for the specified metric
+     * @param max the maximum value of the range for the specified metric
      */
     @Override
-    public void onFilterChanged(List<String> filters) {
-
+    public void onRangeFilterApplied(String metric, double min, double max) {
         model.setRowCount(0);
-
-        if (filters.isEmpty()) {
-            model.setColumnIdentifiers(columnNames);
-            addDataToModel(model);
-            return;
-        }
-        // Always include Country column (add it at the beginning)
-        filters.add(0, "Country");
-        // Update the column headers in the table
-        model.setColumnIdentifiers(filters.toArray());
-
-        for (CountryHappiness countryHappiness : data) {
-            Object[] row = new Object[filters.size()];
-
-            // Populate each cell based on the column filter
-            for (int i = 0; i < filters.size(); i++) {
-                // Use switch expression to get the right data for each column
-                String filter = filters.get(i);
-                row[i] = switch (filter) {
-                    case "Country" -> countryHappiness.country();
-                    case "Happiness Rank" -> countryHappiness.happinessRank();
-                    case "Happiness Score" -> countryHappiness.happinessScore();
-                    case "Economy Score" -> countryHappiness.economy();
-                    case "Social Score" -> countryHappiness.socialScore();
-                    case "Health Score" -> countryHappiness.healthScore();
-                    default -> "";
+        for (CountryHappiness country : data) {
+            if (meetsRangeFilter(country, metric, min, max)) {
+                Object[] row = {
+                        country.country(),
+                        country.happinessRank(),
+                        country.happinessScore(),
+                        country.economy(),
+                        country.socialScore(),
+                        country.healthScore()
                 };
+                model.addRow(row);
             }
-            model.addRow(row);
         }
+    }
+
+    // resets back to original table without filters
+    @Override
+    public void onResetFilters() {
+        model.setRowCount(0);
+        addDataToModel(model);
+    }
+
+
+    /**
+     * Checks if the given CountryHappiness object meets the specified range filter
+     * based on the provided metric, minimum, and maximum values.
+     *
+     * @param country the country object containing happiness data to evaluate
+     * @param metric the metric to filter by (e.g., "Happiness Score", "Economy Score", etc.)
+     * @param min the minimum value of the range for the specified metric
+     * @param max the maximum value of the range for the specified metric
+     * @return true if the country metric's value is within the specified range; false otherwise
+     */
+    private boolean meetsRangeFilter(CountryHappiness country, String metric, double min, double max) {
+        return switch (metric) {
+            case "Happiness Score" -> country.happinessScore() >= min && country.happinessScore() <= max;
+            case "Economy Score" -> country.economy() >= min && country.economy() <= max;
+            case "Social Score" -> country.socialScore() >= min && country.socialScore() <= max;
+            case "Health Score" -> country.healthScore() >= min && country.healthScore() <= max;
+            default -> true;
+        };
     }
 
     /**
@@ -149,21 +160,19 @@ public class TablePanel extends JPanel implements FilterListener{
     }
 
     /**
-     * Updates the details panel to display data from the specified row in the table.
-     * The data is retrieved from the table model for the given row and passed
-     * to the associated DetailsPanel instance.
-     *
-     * @param row The index of the row in the table whose details should be displayed in the details panel.
+     * Updates the details panel with information from a specified row in the table model.
+     * @param row the index of the row in the table model whose details are to be displayed
      */
 
     public void updateDetailsPanel(int row) {
+        // get the number of columns in case a filter has been applied
         int numColumns = model.getColumnCount();
         String[] details = new String[numColumns];
             for (int i = 0; i < numColumns; i++) {
+                // set the details array here to prevent problems in details panel
                 details[i] = model.getColumnName(i) + "  ->  " + model.getValueAt(row, i).toString() + "    ";
 
             }
-
             detailsPanel.onRowClicked(details);
     }
 }

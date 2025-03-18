@@ -6,5 +6,8 @@ import java.util.List;
  * that notifies TablePanel when filter selections change.
  */
 public interface FilterListener {
-    void onFilterChanged(List<String> selectedFilters);
+
+    void onRangeFilterApplied(String metric, double min, double max);
+
+    void onResetFilters();
 }
