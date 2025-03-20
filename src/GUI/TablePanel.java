@@ -19,7 +19,7 @@ public class TablePanel extends JPanel implements FilterListener{
     private String[] columnNames;
     private filterPanel filterPanel;
     private DetailsPanel detailsPanel;
-    private DataUpdateListener dataChangeListener; // listener for the stats panel
+    private List<DataUpdateListener> dataChangeListeners; // listener for the stats panel
 
     /**
      * Constructor that initializes the table panel with data from CSV file.
@@ -64,7 +64,7 @@ public class TablePanel extends JPanel implements FilterListener{
      * This is called by the constructor.
      */
     private void initializeTable() {
-
+        dataChangeListeners = new ArrayList<>();
         model = new DefaultTableModel(columnNames, 0); // initialize to  0 rows at first then add data after
         addDataToModel(model);
         this.setLayout(new BorderLayout());
@@ -118,14 +118,14 @@ public class TablePanel extends JPanel implements FilterListener{
                 model.addRow(row);
             }
         }
-        dataChangeListener.onDataUpdated(filteredData);
+        notifyDataChangeListeners(filteredData);
     }
 
 
     // resets back to original table without filters
     @Override
     public void onResetFilters() {
-        dataChangeListener.onDataUpdated(data); // if reset change stats back to original table
+        notifyDataChangeListeners(data); // if reset change stats back to original table
         model.setRowCount(0);
         addDataToModel(model);
     }
@@ -179,8 +179,25 @@ public class TablePanel extends JPanel implements FilterListener{
             detailsPanel.onRowClicked(details);
     }
 
-    public void setDataChangeListener(DataUpdateListener listener) {
-        this.dataChangeListener = listener;
+    /**
+     * Adds a listener that will be notified when there is a change in the table's data.
+     *
+     * @param listener the DataUpdateListener instance to be registered for data change events
+     */
+
+    public void addDataChangeListener(DataUpdateListener listener) {
+        dataChangeListeners.add(listener);
+    }
+
+    /**
+     * Notifies all registered data change listeners about an update to the dataset.
+     *
+     * @param data The list of CountryHappiness records representing the updated data.
+     */
+    private void notifyDataChangeListeners(List<CountryHappiness> data) {
+        for (DataUpdateListener listener : dataChangeListeners) {
+            listener.onDataUpdated(data);
+        }
     }
 
 }

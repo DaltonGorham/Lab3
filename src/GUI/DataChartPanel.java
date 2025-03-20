@@ -68,11 +68,27 @@ public class DataChartPanel extends JPanel implements DataUpdateListener{
 
     }
 
+    /**
+     * Updates the chart when the data is updated. This method clears and refreshes
+     * the dataset using the provided list of {@code CountryHappiness} objects.
+     *
+     * @param data the new list of {@code CountryHappiness} objects containing the
+     *             updated happiness and economy scores for various countries
+     */
     @Override
     public void onDataUpdated(List<CountryHappiness> data) {
         updateChart(data);
     }
 
+    /**
+     * Updates the chart dataset and subtitle based on the provided list of {@code CountryHappiness}
+     * objects. This method clears the current dataset and populates it with the happiness score and
+     * economy score corresponding to each country in the list. Updates the chart's subtitle to
+     * display the total number of countries in the updated data.
+     *
+     * @param data the list of {@code CountryHappiness} objects containing the updated happiness
+     *             scores, economy scores, and country names
+     */
     private void updateChart(List<CountryHappiness> data) {
         dataset.clear();
 

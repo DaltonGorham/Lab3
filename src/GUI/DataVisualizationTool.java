@@ -6,6 +6,8 @@ import java.io.IOException;
 
 public class DataVisualizationTool extends JFrame {
     public static void main(String[] args) throws IOException {
+
+
         JFrame frame = new JFrame("Country Happiness Data");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -23,8 +25,8 @@ public class DataVisualizationTool extends JFrame {
 
         // set listeners
         tablePanel.setDetailsPanel(detailsPanel);
-        tablePanel.setDataChangeListener(statsPanel);
-        tablePanel.setDataChangeListener(chartPanel);
+        tablePanel.addDataChangeListener(statsPanel);
+        tablePanel.addDataChangeListener(chartPanel);
 
 
         // add to frame
