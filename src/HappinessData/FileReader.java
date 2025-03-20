@@ -8,7 +8,15 @@ import java.util.stream.Collectors;
 import static HappinessData.CountryHappiness.*;
 
 public class FileReader {
-
+    /**
+     * Reads data from the specified file path, parses the content, and creates a list of
+     * CountryHappiness objects. The method skips the header row in the input file, filters
+     * out invalid rows, and initializes missing or empty data values with default values.
+     *
+     * @param path the file path to read the data from.
+     * @return an ArrayList of CountryHappiness objects populated with data from the file.
+     * @throws IOException if an I/O error occurs while reading the file.
+     */
     public static ArrayList<CountryHappiness> read(String path) throws IOException {
         String content = Files.readString(Path.of(path), StandardCharsets.UTF_8);
         try (BufferedReader reader = new BufferedReader(new StringReader(content))) {

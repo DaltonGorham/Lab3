@@ -2,12 +2,14 @@ package GUI;
 import HappinessData.CountryHappiness;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import static HappinessData.FileReader.read;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -19,7 +21,8 @@ public class TablePanel extends JPanel implements FilterListener{
     private String[] columnNames;
     private filterPanel filterPanel;
     private DetailsPanel detailsPanel;
-    private List<DataUpdateListener> dataChangeListeners; // listener for the stats panel
+    private List<DataUpdateListener> dataChangeListeners; // listeners for stats and chart panel
+    private TableRowSorter sorter;
 
     /**
      * Constructor that initializes the table panel with data from CSV file.
@@ -70,7 +73,6 @@ public class TablePanel extends JPanel implements FilterListener{
         this.setLayout(new BorderLayout());
 
         // Create filter panel and register this class as the listener
-
         filterPanel = new filterPanel(this);
         add(filterPanel, BorderLayout.NORTH);
 
@@ -79,15 +81,18 @@ public class TablePanel extends JPanel implements FilterListener{
         scrollPane = new JScrollPane(table);
         scrollPane.setPreferredSize(new Dimension(1200, 500));
         add(scrollPane, BorderLayout.WEST);
+        allowSorting();
 
         // Mouse listener when clicking a row in the table it sends data to details panel
         table.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                int row = table.getSelectedRow();
+               int col = table.getSelectedColumn();
                if (row >= 0) {
                    updateDetailsPanel(row);
                }
+
             }
         });
     }
@@ -127,6 +132,7 @@ public class TablePanel extends JPanel implements FilterListener{
     public void onResetFilters() {
         notifyDataChangeListeners(data); // if reset change stats back to original table
         model.setRowCount(0);
+        resetSorting();
         addDataToModel(model);
     }
 
@@ -198,6 +204,43 @@ public class TablePanel extends JPanel implements FilterListener{
         for (DataUpdateListener listener : dataChangeListeners) {
             listener.onDataUpdated(data);
         }
+    }
+
+    private void allowSorting(){
+
+        // initialize the table row sorter
+        sorter = new TableRowSorter<>(model);
+        table.setRowSorter(sorter);
+
+        // listener for clicking a column
+        table.getTableHeader().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e){
+                int col = table.getColumnModel().getColumnIndexAtX(e.getX());
+                sorter.toggleSortOrder(col);
+            }
+        });
+
+        // sorting logic:
+        // country sorted alphabetically
+        // all others sorted by either ascending or descending
+        sorter.setComparator(0, String.CASE_INSENSITIVE_ORDER);
+
+        sorter.setComparator(1, (Comparator<Integer>) Integer::compare);
+
+        for (int column = 2; column < columnNames.length; column++) {
+            sorter.setComparator(column, (Comparator<Double>) Double::compare);
+        }
+
+
+        table.getTableHeader().setReorderingAllowed(false);
+        table.getTableHeader().setResizingAllowed(true);
+    }
+
+    // reset all sorts
+    private void resetSorting(){
+        sorter.setSortKeys(null);
+        table.getTableHeader().repaint();
     }
 
 }
