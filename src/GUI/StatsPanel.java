@@ -35,17 +35,19 @@ public class StatsPanel extends JPanel implements DataUpdateListener{
         setPreferredSize(new Dimension(600, 300));
         setMaximumSize(new Dimension(600, 300));
 
-
+        // Title
         titleLabel = new JLabel("Statistics");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
         titleLabel.setAlignmentY(Component.TOP_ALIGNMENT);
 
+        // For the actual data
         textArea = new JTextArea();
         textArea.setEditable(false);
         textArea.setFont(new Font("Arial", Font.BOLD, 16));
         textArea.setAlignmentX(Component.LEFT_ALIGNMENT);
         textArea.setBorder(new MatteBorder(0, 0, 3, 3, Color.BLACK));
 
+        // add the label and text
         add(titleLabel);
         add(textArea);
         setVisible(true);
